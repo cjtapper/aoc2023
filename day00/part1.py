@@ -7,7 +7,7 @@ import support
 
 
 def solve_for(input_data: str) -> int:
-    numbers = [parse_line(line) for line in input_data.split()]
+    numbers = (parse_line(line) for line in input_data.splitlines())
     for n in numbers:
         pass
 
