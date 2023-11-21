@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 import support
 
 
@@ -16,12 +18,20 @@ def parse_line(line: str) -> str:
     return line
 
 
-INPUT1 = """\
+EXAMPLE_1 = """\
 
 """
-EXPECTED1 = 0
+EXPECTED_1 = 0
 
-assert solve_for(INPUT1) == EXPECTED1
+
+@pytest.mark.parametrize(
+    "input_data,expected",
+    [
+        (EXAMPLE_1, EXPECTED_1),
+    ],
+)
+def test_example1(input_data, expected):
+    assert solve_for(input_data) == expected
 
 
 if __name__ == "__main__":
