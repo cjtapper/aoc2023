@@ -55,11 +55,15 @@ zoneight234
 """
 EXPECTED_1 = 281
 
+EXAMPLE_2 = "91twonelt"
+EXPECTED_2 = 91
+
 
 @pytest.mark.parametrize(
     "input_data,expected",
     [
         (EXAMPLE_1, EXPECTED_1),
+        (EXAMPLE_2, EXPECTED_2),
     ],
 )
 def test_example1(input_data, expected):
