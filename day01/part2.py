@@ -36,17 +36,10 @@ def parse_calibration_value(line: str) -> int:
 
 def find_digits(line: str) -> list[str]:
     # Python's re.findall() function only finds NON-OVERLAPPING matches.
-    # This means that if we try to find digits in a string like "twone",
-    # we would only find "two".
-    # To get around this, we can use a lookahead assertion (denoted by
+    # To get around this, we can use a lookahead expression (denoted by
     # (?=...).
-    # So essentially what we are doing here is matching zero length
-    # strings that are immediately followed by our digit pattern. This
-    # returns two match groups:
-    #   0: the zero length string
-    #   1: the string matching our lookahead pattern
     pattern = re.compile(rf"(?=({DIGIT_PATTERN}))")
-    return [match.group(1) for match in pattern.finditer(line)]
+    return pattern.findall(line)
 
 
 def unspell_digit(digit: str) -> str:
