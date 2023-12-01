@@ -6,7 +6,7 @@ import pytest
 
 import support
 
-SPELLED_OUT_DIGITS = {
+DIGITS_AS_WORDS = {
     "one": "1",
     "two": "2",
     "three": "3",
@@ -18,7 +18,7 @@ SPELLED_OUT_DIGITS = {
     "nine": "9",
 }
 
-DIGIT_PATTERN = "|".join([*SPELLED_OUT_DIGITS.keys(), r"[0-9]"])
+DIGIT_PATTERN = "|".join([*DIGITS_AS_WORDS.keys(), r"[0-9]"])
 
 
 def solve_for(input_data: str) -> int:
@@ -31,19 +31,17 @@ def solve_for(input_data: str) -> int:
 
 def parse_calibration_value(line: str) -> int:
     digits = find_digits(line)
-    return int(unspell_digit(digits[0]) + unspell_digit(digits[-1]))
+    return int(translate_digit(digits[0]) + translate_digit(digits[-1]))
 
 
 def find_digits(line: str) -> list[str]:
-    # Python's re.findall() function only finds NON-OVERLAPPING matches.
-    # To get around this, we can use a lookahead expression (denoted by
-    # (?=...).
-    pattern = re.compile(rf"(?=({DIGIT_PATTERN}))")
-    return pattern.findall(line)
+    # Use lookahead (?=...) to get overlapping matches
+    overlapping_digits_pattern = re.compile(rf"(?=({DIGIT_PATTERN}))")
+    return overlapping_digits_pattern.findall(line)
 
 
-def unspell_digit(digit: str) -> str:
-    return SPELLED_OUT_DIGITS.get(digit, digit)
+def translate_digit(digit: str) -> str:
+    return DIGITS_AS_WORDS.get(digit, digit)
 
 
 EXAMPLE_1 = """\
