@@ -6,7 +6,7 @@ import pytest
 
 import support
 
-DIGITS_AS_WORDS = {
+WORDS_TO_DIGITS = {
     "one": "1",
     "two": "2",
     "three": "3",
@@ -18,7 +18,7 @@ DIGITS_AS_WORDS = {
     "nine": "9",
 }
 
-DIGIT_PATTERN = "|".join([*DIGITS_AS_WORDS.keys(), r"[0-9]"])
+DIGIT_PATTERN = "|".join([*WORDS_TO_DIGITS.keys(), r"[0-9]"])
 
 
 def solve_for(input_data: str) -> int:
@@ -41,7 +41,7 @@ def find_digits(line: str) -> list[str]:
 
 
 def translate_digit(digit: str) -> str:
-    return DIGITS_AS_WORDS.get(digit, digit)
+    return WORDS_TO_DIGITS.get(digit, digit)
 
 
 EXAMPLE_1 = """\
