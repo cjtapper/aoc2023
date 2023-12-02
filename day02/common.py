@@ -18,6 +18,10 @@ class CubeCollection:
     green: int = 0
     blue: int = 0
 
+    @property
+    def power(self):
+        return self.red * self.green * self.blue
+
     def contains(self, other_cubes: CubeCollection) -> bool:
         return (
             (other_cubes.red <= self.red)

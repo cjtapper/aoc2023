@@ -2,63 +2,23 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 import pytest
 
 import support
 
-
-@dataclass
-class Game:
-    id: int
-    reveals: list[Reveal]
-
-
-@dataclass
-class Reveal:
-    red: int = 0
-    green: int = 0
-    blue: int = 0
-
-
-@dataclass
-class Bag:
-    red: int
-    green: int
-    blue: int
-
-    @property
-    def power(self):
-        return self.red * self.green * self.blue
+from . import common
 
 
 def solve_for(input_data: str) -> int:
-    games = (parse_game(line) for line in input_data.splitlines())
+    games = (common.parse_game(line) for line in input_data.splitlines())
     return sum(get_min_bag(game).power for game in games)
 
 
-def parse_game(input: str) -> Game:
-    raw_game, _, raw_reveals = input.partition(":")
-
-    game_id = int(raw_game.split()[1])
-
-    reveals = []
-    for raw_reveal in raw_reveals.split(";"):
-        cubes_seen = {}
-        for cube_count in raw_reveal.split(","):
-            count, colour = cube_count.strip().split()
-            cubes_seen[colour] = int(count)
-        reveals.append(Reveal(**cubes_seen))
-
-    return Game(id=game_id, reveals=reveals)
-
-
-def get_min_bag(game: Game) -> Bag:
-    return Bag(
-        red=max(reveal.red for reveal in game.reveals),
-        green=max(reveal.green for reveal in game.reveals),
-        blue=max(reveal.blue for reveal in game.reveals),
+def get_min_bag(game: common.Game) -> common.CubeCollection:
+    return common.CubeCollection(
+        red=max(round.red for round in game.rounds),
+        green=max(round.green for round in game.rounds),
+        blue=max(round.blue for round in game.rounds),
     )
 
 
