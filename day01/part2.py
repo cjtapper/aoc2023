@@ -68,7 +68,7 @@ EXPECTED_2 = 91
         (EXAMPLE_2, EXPECTED_2),
     ],
 )
-def test_example1(input_data, expected):
+def test_example(input_data, expected):
     assert solve_for(input_data) == expected
 
 
