@@ -2,57 +2,18 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 import pytest
 
 import support
 
-
-@dataclass
-class Game:
-    id: int
-    rounds: list[CubeCollection]
-
-    def is_valid_for(self, bag: CubeCollection) -> bool:
-        return all(bag.contains(round) for round in self.rounds)
-
-
-@dataclass
-class CubeCollection:
-    red: int = 0
-    green: int = 0
-    blue: int = 0
-
-    def contains(self, other_cubes: CubeCollection) -> bool:
-        return (
-            (other_cubes.red <= self.red)
-            and (other_cubes.green <= self.green)
-            and (other_cubes.blue <= self.blue)
-        )
+from . import common
 
 
 def solve_for(input_data: str) -> int:
-    bag = CubeCollection(red=12, green=13, blue=14)
+    bag = common.CubeCollection(red=12, green=13, blue=14)
 
-    games = (parse_game(line) for line in input_data.splitlines())
+    games = (common.parse_game(line) for line in input_data.splitlines())
     return sum(game.id for game in games if game.is_valid_for(bag))
-
-
-def parse_game(input: str) -> Game:
-    raw_game, _, raw_rounds = input.partition(":")
-
-    game_id = int(raw_game.split()[1])
-
-    rounds = []
-    for raw_round in raw_rounds.split(";"):
-        cubes_seen = {}
-        for cube_count in raw_round.split(","):
-            count, colour = cube_count.strip().split()
-            cubes_seen[colour] = int(count)
-        rounds.append(CubeCollection(**cubes_seen))
-
-    return Game(id=game_id, rounds=rounds)
 
 
 EXAMPLE_1 = """\
