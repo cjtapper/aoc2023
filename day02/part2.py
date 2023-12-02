@@ -15,11 +15,13 @@ def solve_for(input_data: str) -> int:
 
 
 def get_min_bag(game: common.Game) -> common.CubeCollection:
-    return common.CubeCollection(
-        red=max(round.red for round in game.rounds),
-        green=max(round.green for round in game.rounds),
-        blue=max(round.blue for round in game.rounds),
-    )
+    red = green = blue = 0
+    for round in game.rounds:
+        red = max(red, round.red)
+        green = max(green, round.green)
+        blue = max(blue, round.blue)
+
+    return common.CubeCollection(red=red, green=green, blue=blue)
 
 
 EXAMPLE_1 = """\
