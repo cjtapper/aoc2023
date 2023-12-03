@@ -23,8 +23,7 @@ class Schematic:
         )
 
     @property
-    def gears(self) -> list[Gear]:
-        gears = []
+    def gears(self) -> Generator[Gear, None, None]:
         candidate_symbols = (s for s in self.symbols if s.value == GEAR_SYMBOL)
         for symbol in candidate_symbols:
             adjacent_part_numbers = [
@@ -33,14 +32,11 @@ class Schematic:
                 if part_number.is_adjacent_to(symbol)
             ]
             if len(adjacent_part_numbers) == 2:
-                gears.append(
-                    Gear(
-                        symbol=symbol,
-                        part_number_1=adjacent_part_numbers[0],
-                        part_number_2=adjacent_part_numbers[1],
-                    )
+                yield Gear(
+                    symbol=symbol,
+                    part_number_1=adjacent_part_numbers[0],
+                    part_number_2=adjacent_part_numbers[1],
                 )
-        return gears
 
 
 @dataclass
