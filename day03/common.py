@@ -9,6 +9,12 @@ NUMBER_OR_SYMBOL = re.compile(r"([0-9]+|[^.])")
 
 
 @dataclass
+class Schematic:
+    numbers: list[SchematicNumber]
+    symbols: list[SchematicSymbol]
+
+
+@dataclass
 class SchematicNumber:
     value: int
     bounding_box: Box
@@ -68,7 +74,7 @@ class Point(NamedTuple):
 
 def parse_schematic(
     schematic: str,
-) -> tuple[list[SchematicNumber], list[SchematicSymbol]]:
+) -> Schematic:
     numbers = []
     symbols = []
     for row_index, row in enumerate(schematic.splitlines()):
@@ -85,7 +91,7 @@ def parse_schematic(
                 )
             elif is_symbol(match[0]):
                 symbols.append(SchematicSymbol(position=position))
-    return numbers, symbols
+    return Schematic(numbers, symbols)
 
 
 def is_symbol(char: str) -> bool:

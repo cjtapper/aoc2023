@@ -10,11 +10,11 @@ from . import common
 
 
 def solve_for(input_data: str) -> int:
-    numbers, symbols = common.parse_schematic(input_data)
+    schematic = common.parse_schematic(input_data)
     acc = 0
 
-    for number in numbers:
-        if any(number.is_adjacent_to(symbol) for symbol in symbols):
+    for number in schematic.numbers:
+        if any(number.is_adjacent_to(symbol) for symbol in schematic.symbols):
             acc += number.value
 
     return acc
