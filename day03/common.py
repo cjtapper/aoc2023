@@ -13,6 +13,14 @@ class Schematic:
     numbers: list[SchematicNumber]
     symbols: list[SchematicSymbol]
 
+    @property
+    def part_numbers(self) -> list[SchematicNumber]:
+        return [
+            number
+            for number in self.numbers
+            if any(number.is_adjacent_to(symbol) for symbol in self.symbols)
+        ]
+
 
 @dataclass
 class SchematicNumber:
