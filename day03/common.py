@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from functools import cached_property
-from typing import NamedTuple
+from typing import Generator, NamedTuple
 
 GEAR_SYMBOL = "*"
 NUMBER_OR_SYMBOL = re.compile(r"([0-9]+|[^.])")
@@ -15,29 +15,29 @@ class Schematic:
     symbols: list[SchematicSymbol]
 
     @property
-    def part_numbers(self) -> list[SchematicNumber]:
-        return [
+    def part_numbers(self) -> Generator[SchematicNumber, None, None]:
+        return (
             number
             for number in self.numbers
             if any(number.is_adjacent_to(symbol) for symbol in self.symbols)
-        ]
+        )
 
     @property
     def gears(self) -> list[Gear]:
         gears = []
         candidate_symbols = (s for s in self.symbols if s.value == GEAR_SYMBOL)
         for symbol in candidate_symbols:
-            adjacent_numbers = [
+            adjacent_part_numbers = [
                 part_number
                 for part_number in self.part_numbers
                 if part_number.is_adjacent_to(symbol)
             ]
-            if len(adjacent_numbers) == 2:
+            if len(adjacent_part_numbers) == 2:
                 gears.append(
                     Gear(
                         symbol=symbol,
-                        part_number_1=adjacent_numbers[0],
-                        part_number_2=adjacent_numbers[1],
+                        part_number_1=adjacent_part_numbers[0],
+                        part_number_2=adjacent_part_numbers[1],
                     )
                 )
         return gears
