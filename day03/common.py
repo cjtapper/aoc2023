@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import NamedTuple
 
+GEAR_SYMBOL = "*"
 NUMBER_OR_SYMBOL = re.compile(r"([0-9]+|[^.])")
 
 
@@ -20,6 +21,26 @@ class Schematic:
             for number in self.numbers
             if any(number.is_adjacent_to(symbol) for symbol in self.symbols)
         ]
+
+    @property
+    def gears(self) -> list[Gear]:
+        gears = []
+        candidate_symbols = (s for s in self.symbols if s.value == GEAR_SYMBOL)
+        for symbol in candidate_symbols:
+            adjacent_numbers = [
+                part_number
+                for part_number in self.part_numbers
+                if part_number.is_adjacent_to(symbol)
+            ]
+            if len(adjacent_numbers) == 2:
+                gears.append(
+                    Gear(
+                        symbol=symbol,
+                        part_number_1=adjacent_numbers[0],
+                        part_number_2=adjacent_numbers[1],
+                    )
+                )
+        return gears
 
 
 @dataclass
@@ -44,7 +65,19 @@ class SchematicNumber:
 
 @dataclass
 class SchematicSymbol:
+    value: str
     position: Point
+
+
+@dataclass
+class Gear:
+    symbol: SchematicSymbol
+    part_number_1: SchematicNumber
+    part_number_2: SchematicNumber
+
+    @property
+    def gear_ratio(self):
+        return self.part_number_1.value * self.part_number_2.value
 
 
 @dataclass
@@ -98,7 +131,7 @@ def parse_schematic(
                     )
                 )
             elif is_symbol(match[0]):
-                symbols.append(SchematicSymbol(position=position))
+                symbols.append(SchematicSymbol(value=match[0], position=position))
     return Schematic(numbers, symbols)
 
 
