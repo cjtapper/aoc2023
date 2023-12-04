@@ -12,19 +12,12 @@ from . import common
 
 def solve_for(input_data: str) -> int:
     cards = [common.parse_card(line) for line in input_data.splitlines()]
-    card_counts = Counter(card.id for card in cards)
+    card_counts = Counter(card for card in cards)
 
-    for card_id in card_counts:
-        count = card_counts[card_id]
-        num_matching = len(cards[card_id - 1].matching_numbers)
-        card_counts.update(
-            {
-                id: count
-                for id in range(
-                    card_id + 1, min(len(cards), card_id + num_matching + 1)
-                )
-            }
-        )
+    for card, count in card_counts.items():
+        num_matching = len(card.matching_numbers)
+        cards_won = {card: count for card in cards[card.id : card.id + num_matching]}
+        card_counts.update(cards_won)
 
     return card_counts.total()
 

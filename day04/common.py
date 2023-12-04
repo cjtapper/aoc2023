@@ -4,11 +4,11 @@ from dataclasses import dataclass
 from typing import Generator
 
 
-@dataclass
+@dataclass(frozen=True)
 class Card:
     id: int
-    winning_numbers: set[int]
-    numbers: list[int]
+    winning_numbers: frozenset[int]
+    numbers: tuple[int, ...]
 
     @property
     def points(self) -> int:
@@ -30,8 +30,8 @@ def parse_card(line: str) -> Card:
 
     return Card(
         id=int(card_id),
-        numbers=list(card_numbers),
-        winning_numbers=set(winning_numbers),
+        numbers=tuple(card_numbers),
+        winning_numbers=frozenset(winning_numbers),
     )
 
 
