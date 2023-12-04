@@ -2,32 +2,16 @@
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass
-from typing import Generator
 
 import pytest
 
 import support
 
-
-@dataclass
-class Card:
-    id: int
-    winning_numbers: set[int]
-    numbers: list[int]
-
-    @property
-    def points(self) -> int:
-        num_matching = len(self.matching_numbers)
-        return 2**num_matching >> 1
-
-    @property
-    def matching_numbers(self) -> list[int]:
-        return [number for number in self.numbers if number in self.winning_numbers]
+from . import common
 
 
 def solve_for(input_data: str) -> int:
-    cards = [parse_card(line) for line in input_data.splitlines()]
+    cards = [common.parse_card(line) for line in input_data.splitlines()]
     card_counts = Counter(card.id for card in cards)
 
     for card_id in card_counts:
@@ -43,25 +27,6 @@ def solve_for(input_data: str) -> int:
         )
 
     return card_counts.total()
-
-
-def parse_card(line: str) -> Card:
-    card, numbers = line.split(":")
-    _, card_id = card.split()
-
-    winning_numbers_raw, card_numbers_raw = numbers.split("|")
-    winning_numbers = parse_numbers(winning_numbers_raw)
-    card_numbers = parse_numbers(card_numbers_raw)
-
-    return Card(
-        id=int(card_id),
-        numbers=list(card_numbers),
-        winning_numbers=set(winning_numbers),
-    )
-
-
-def parse_numbers(s: str) -> Generator[int, None, None]:
-    return (int(number) for number in s.split())
 
 
 EXAMPLE_1 = """\

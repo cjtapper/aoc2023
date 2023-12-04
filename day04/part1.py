@@ -1,49 +1,17 @@
 # https://adventofcode.com/2023/day/4
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Generator
-
 import pytest
 
 import support
 
-
-@dataclass
-class Card:
-    id: int
-    winning_numbers: set[int]
-    numbers: list[int]
-
-    @property
-    def points(self) -> int:
-        winners = sum(1 for number in self.numbers if number in self.winning_numbers)
-        return 2**winners >> 1
+from . import common
 
 
 def solve_for(input_data: str) -> int:
-    cards = (parse_card(line) for line in input_data.splitlines())
+    cards = (common.parse_card(line) for line in input_data.splitlines())
 
     return sum(card.points for card in cards)
-
-
-def parse_card(line: str) -> Card:
-    card, numbers = line.split(":")
-    _, card_id = card.split()
-
-    winning_numbers_raw, card_numbers_raw = numbers.split("|")
-    winning_numbers = parse_numbers(winning_numbers_raw)
-    card_numbers = parse_numbers(card_numbers_raw)
-
-    return Card(
-        id=int(card_id),
-        numbers=list(card_numbers),
-        winning_numbers=set(winning_numbers),
-    )
-
-
-def parse_numbers(s: str) -> Generator[int, None, None]:
-    return (int(number) for number in s.split())
 
 
 EXAMPLE_1 = """\
