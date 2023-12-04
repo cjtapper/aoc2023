@@ -12,7 +12,7 @@ from . import common
 
 def solve_for(input_data: str) -> int:
     cards = [common.parse_card(line) for line in input_data.splitlines()]
-    card_counts = Counter(card for card in cards)
+    card_counts = Counter(cards)
 
     for card, count in card_counts.items():
         num_matching = len(card.matching_numbers)
