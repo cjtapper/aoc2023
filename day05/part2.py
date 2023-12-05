@@ -1,5 +1,8 @@
 # https://adventofcode.com/2023/day/5#part2
 
+# FIXME: Note - currently incomplete. Tests pass, but unable to work
+# with the real data within a reasonable amount of time
+
 from __future__ import annotations
 
 import itertools
@@ -22,6 +25,11 @@ class Almanac:
             target = map.find_dest(target)
             src_category = map.dest_category
         return target
+
+    def find_dest_ranges(
+        self, src_category: str, src_range: range, dest_category: str
+    ) -> list[range]:
+        return []
 
 
 @dataclass
@@ -53,6 +61,12 @@ class AlmanacMapEntry:
         if source in self.src_range:
             return self.dest_range_start + source - self.src_range_start
 
+        return None
+
+    def find_dest_range(self, src_range: range) -> range | None:
+        src_intersection = range_intersection(src_range, self.src_range)
+        if src_intersection:
+            return None  # TODO: this is where I left off
         return None
 
 
@@ -97,6 +111,29 @@ def parse_map(s: str) -> AlmanacMap:
 def parse_entry(s: str) -> AlmanacMapEntry:
     dest_start, src_start, range_len = (int(i) for i in s.split())
     return AlmanacMapEntry(dest_start, src_start, range_len)
+
+
+def merge_ranges(ranges: list[range]) -> list[range]:
+    merged_ranges: list[range] = []
+    for range_ in sorted_ranges(ranges):
+        if not merged_ranges or range_.start > merged_ranges[-1].stop:
+            merged_ranges.append(range_)
+            continue
+        start = merged_ranges.pop()
+        merged_ranges.append(range(start.start, range_.stop))
+    return merged_ranges
+
+
+def range_intersection(r1: range, r2: range) -> range | None:
+    r1, r2 = sorted_ranges([r1, r2])
+    if r1.stop <= r2.start:
+        return None
+
+    return range(r2.start, r1.stop)
+
+
+def sorted_ranges(ranges: list[range]) -> list[range]:
+    return sorted(ranges, key=lambda r: r.start)
 
 
 EXAMPLE_1 = """\
