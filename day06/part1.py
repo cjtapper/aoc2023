@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import math
-from typing import NamedTuple
+from typing import Generator, NamedTuple
 
 import pytest
 
@@ -25,15 +25,15 @@ def solve_for(input_data: str) -> int:
     return acc
 
 
-def parse_races(s: str) -> list[Race]:
+def parse_races(s: str) -> Generator[Race, None, None]:
     unparsed_durations, unparsed_distances = s.splitlines()
     durations = unparsed_durations.split(":")[1].split()
     distances = unparsed_distances.split(":")[1].split()
 
-    return [
+    return (
         Race(int(duration), int(distance))
         for duration, distance in zip(durations, distances)
-    ]
+    )
 
 
 def calculate_hold_range(race: Race) -> range:
