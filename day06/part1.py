@@ -19,8 +19,7 @@ def solve_for(input_data: str) -> int:
     acc = 1
     for race in races:
         hold_range = calculate_hold_range(race)
-        num_possible_record_holds = hold_range.stop - hold_range.start
-        acc *= num_possible_record_holds
+        acc *= len(hold_range)
 
     return acc
 
@@ -37,13 +36,32 @@ def parse_races(s: str) -> Generator[Race, None, None]:
 
 
 def calculate_hold_range(race: Race) -> range:
-    min_hold, max_hold = solve_quadratic_formula(
+    """
+    This problem can be modeled as:
+
+    distance_travelled == (race_duration - hold_time) * hold_time
+
+    If we set distance_travelled to the record_distance + 1, this can be
+    rearranged to a quadratic equation and solved with the quadratic
+    formula. The two solutions represent the minimum and maximum hold
+    times to beat the record.
+
+
+    record_distance + 1 == (race_duration - hold_time) * hold_time
+
+    -1 * hold_time**2 + race_duration * hold_time - (record_distance + 1) == 0
+
+    """
+    min_hold, max_hold = solve_quadratic_equation(
         -1, race.duration, -1 * (race.record_distance + 1)
     )
     return range(math.ceil(min_hold), math.floor(max_hold) + 1)
 
 
-def solve_quadratic_formula(a: float, b: float, c: float) -> tuple[float, float]:
+def solve_quadratic_equation(a: float, b: float, c: float) -> tuple[float, float]:
+    # Solves for x:
+    #
+    # a * x**2 + b * x + c == 0
     return (
         (-1 * b + math.sqrt(b**2 - 4 * a * c)) / (2 * a),
         (-1 * b - math.sqrt(b**2 - 4 * a * c)) / (2 * a),
