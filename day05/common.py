@@ -52,6 +52,50 @@ class IntervalTreeNode(Generic[T]):
     right: IntervalTreeNode[T] | None = None
 
 
+class RangeIntervalTree(Generic[T]):
+    """
+    IntervalTree that searches by range.
+
+    Returns first result found that intersects input range
+    """
+
+    root: IntervalTreeNode[T] | None = None
+
+    def insert(self, interval: range, value: T) -> None:
+        if self.root:
+            self._insert(self.root, interval, value)
+        else:
+            self.root = IntervalTreeNode[T](interval, value)
+
+    def _insert(self, parent: IntervalTreeNode[T], interval: range, value: T) -> None:
+        if interval.start in parent.interval or interval.stop - 1 in parent.interval:
+            raise NotImplementedError("Overlapping ranges are not supported")
+        if interval.start >= parent.interval.stop:
+            if not parent.right:
+                parent.right = IntervalTreeNode[T](interval, value)
+            else:
+                self._insert(parent.right, interval, value)
+        elif interval.stop <= parent.interval.start:
+            if not parent.left:
+                parent.left = IntervalTreeNode[T](interval, value)
+            else:
+                self._insert(parent.left, interval, value)
+        return None
+
+    def search(self, key: range) -> T | None:
+        if not self.root:
+            return None
+        else:
+            return self._search(self.root, key)
+
+    def _search(self, node: IntervalTreeNode[T], key: range) -> T | None:
+        if key.stop < node.interval.start:
+            return self._search(node.left, key) if node.left else None
+        if key.start >= node.interval.stop:
+            return self._search(node.right, key) if node.right else None
+        return node.value
+
+
 @dataclass
 class Almanac:
     maps: dict[str, AlmanacMap]
