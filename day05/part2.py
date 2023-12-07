@@ -17,7 +17,7 @@ from . import common
 
 def solve_for(input_data: str) -> int:
     almanac = common.parse_almanac(input_data)
-    seed_ranges = list(parse_seed_ranges(input_data))
+    seed_ranges = parse_seed_ranges(input_data)
 
     min_location: int = float("inf")  # type: ignore[assignment]
     for seed in itertools.chain.from_iterable(seed_ranges):
