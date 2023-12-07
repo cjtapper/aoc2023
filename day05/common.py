@@ -43,6 +43,20 @@ class IntervalTree(Generic[T]):
             return self._search(node.right, key) if node.right else None
         return node.value
 
+    def search_by_range(self, key: range) -> T | None:
+        """Return first range found that intersects with key"""
+        if not self.root:
+            return None
+        else:
+            return self._search_by_range(self.root, key)
+
+    def _search_by_range(self, node: IntervalTreeNode[T], key: range) -> T | None:
+        if key.stop < node.interval.start:
+            return self._search_by_range(node.left, key) if node.left else None
+        if key.start >= node.interval.stop:
+            return self._search_by_range(node.right, key) if node.right else None
+        return node.value
+
 
 @dataclass
 class IntervalTreeNode(Generic[T]):
@@ -50,50 +64,6 @@ class IntervalTreeNode(Generic[T]):
     value: T
     left: IntervalTreeNode[T] | None = None
     right: IntervalTreeNode[T] | None = None
-
-
-class RangeIntervalTree(Generic[T]):
-    """
-    IntervalTree that searches by range.
-
-    Returns first result found that intersects input range
-    """
-
-    root: IntervalTreeNode[T] | None = None
-
-    def insert(self, interval: range, value: T) -> None:
-        if self.root:
-            self._insert(self.root, interval, value)
-        else:
-            self.root = IntervalTreeNode[T](interval, value)
-
-    def _insert(self, parent: IntervalTreeNode[T], interval: range, value: T) -> None:
-        if interval.start in parent.interval or interval.stop - 1 in parent.interval:
-            raise NotImplementedError("Overlapping ranges are not supported")
-        if interval.start >= parent.interval.stop:
-            if not parent.right:
-                parent.right = IntervalTreeNode[T](interval, value)
-            else:
-                self._insert(parent.right, interval, value)
-        elif interval.stop <= parent.interval.start:
-            if not parent.left:
-                parent.left = IntervalTreeNode[T](interval, value)
-            else:
-                self._insert(parent.left, interval, value)
-        return None
-
-    def search(self, key: range) -> T | None:
-        if not self.root:
-            return None
-        else:
-            return self._search(self.root, key)
-
-    def _search(self, node: IntervalTreeNode[T], key: range) -> T | None:
-        if key.stop < node.interval.start:
-            return self._search(node.left, key) if node.left else None
-        if key.start >= node.interval.stop:
-            return self._search(node.right, key) if node.right else None
-        return node.value
 
 
 @dataclass
@@ -162,3 +132,36 @@ def parse_map(s: str) -> AlmanacMap:
 def parse_entry(s: str) -> AlmanacMapEntry:
     dest_start, src_start, range_len = (int(i) for i in s.split())
     return AlmanacMapEntry(src_start, dest_start, range_len)
+
+
+def merge_ranges(ranges: list[range]) -> list[range]:
+    merged_ranges: list[range] = []
+    for range_ in sorted_ranges(ranges):
+        if not merged_ranges or range_.start > merged_ranges[-1].stop:
+            merged_ranges.append(range_)
+            continue
+        start = merged_ranges.pop()
+        merged_ranges.append(range(start.start, range_.stop))
+    return merged_ranges
+
+
+def range_intersection(r1: range, r2: range) -> range | None:
+    r1, r2 = sorted_ranges([r1, r2])
+    if r1.stop <= r2.start:
+        return None
+
+    return range(r2.start, r1.stop)
+
+
+def diff_ranges(r1: range, r2: range) -> list[range]:
+    """Returns portions of r1 that do not intersect r2"""
+    result: list[range] = []
+    if r1.start < r2.start:
+        result.append(range(r1.start, min(r1.stop, r2.start)))
+    if r1.stop >= r2.stop:
+        result.append(range(max(r1.start, r2.stop), r1.stop))
+    return result
+
+
+def sorted_ranges(ranges: list[range]) -> list[range]:
+    return sorted(ranges, key=lambda r: r.start)

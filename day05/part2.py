@@ -37,29 +37,6 @@ def parse_seed_ranges(s: str) -> Generator[range, None, None]:
         yield range(int(start), int(start) + int(range_length))
 
 
-def merge_ranges(ranges: list[range]) -> list[range]:
-    merged_ranges: list[range] = []
-    for range_ in sorted_ranges(ranges):
-        if not merged_ranges or range_.start > merged_ranges[-1].stop:
-            merged_ranges.append(range_)
-            continue
-        start = merged_ranges.pop()
-        merged_ranges.append(range(start.start, range_.stop))
-    return merged_ranges
-
-
-def range_intersection(r1: range, r2: range) -> range | None:
-    r1, r2 = sorted_ranges([r1, r2])
-    if r1.stop <= r2.start:
-        return None
-
-    return range(r2.start, r1.stop)
-
-
-def sorted_ranges(ranges: list[range]) -> list[range]:
-    return sorted(ranges, key=lambda r: r.start)
-
-
 EXAMPLE_1 = """\
 seeds: 79 14 55 13
 
