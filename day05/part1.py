@@ -29,12 +29,11 @@ class IntervalTree(Generic[T]):
                 parent.right = IntervalTreeNode[T](interval, value)
             else:
                 self._insert(parent.right, interval, value)
-        elif interval.stop < parent.interval.start:
+        elif interval.stop <= parent.interval.start:
             if not parent.left:
                 parent.left = IntervalTreeNode[T](interval, value)
             else:
                 self._insert(parent.left, interval, value)
-        breakpoint()
         return None
 
     def search(self, key: int) -> T | None:
@@ -80,9 +79,12 @@ class AlmanacMap:
 
     entries: IntervalTree[AlmanacMapEntry]
 
-    def find_dest(self, source: int):
+    def find_dest(self, source: int) -> int:
         map_entry = self.entries.search(source)
-        return map_entry.find_dest(source) if map_entry else source
+        if not map_entry:
+            return source
+        dest = map_entry.find_dest(source)
+        return dest or source
 
 
 @dataclass
@@ -131,9 +133,9 @@ def parse_map(s: str) -> AlmanacMap:
     src_category, dest_category = category_line.split()[0].split("-to-")
     entries: IntervalTree[AlmanacMapEntry] = IntervalTree()
     parsed_entries = (parse_entry(line) for line in entry_lines)
+    breakpoint()
     for entry in parsed_entries:
         entries.insert(entry.src_range, entry)
-    breakpoint()
     return AlmanacMap(src_category, dest_category, entries)
 
 
