@@ -10,13 +10,19 @@ from . import common
 
 
 def solve_for(input_data: str) -> int:
+    seeds = parse_seeds(input_data)
     almanac = common.parse_almanac(input_data)
 
     locations = []
-    for seed in almanac.target_seeds:
+    for seed in seeds:
         locations.append(almanac.find_dest("seed", seed, "location"))
 
     return min(locations)
+
+
+def parse_seeds(s: str) -> list[int]:
+    _, *seeds = s.splitlines()[0].split()
+    return [int(seed) for seed in seeds]
 
 
 EXAMPLE_1 = """\

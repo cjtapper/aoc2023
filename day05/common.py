@@ -54,7 +54,6 @@ class IntervalTreeNode(Generic[T]):
 
 @dataclass
 class Almanac:
-    target_seeds: list[int]
     maps: dict[str, AlmanacMap]
 
     def find_dest(self, src_category: str, src: int, dest_category: str) -> int:
@@ -98,18 +97,12 @@ class AlmanacMapEntry:
 
 
 def parse_almanac(s: str) -> Almanac:
-    seed_section, *maps_s = s.split("\n\n")
-    seeds = parse_seeds(seed_section)
+    _, *maps_s = s.split("\n\n")
 
     parsed_maps = [parse_map(map) for map in maps_s]
     maps = {map.src_category: map for map in parsed_maps}
 
-    return Almanac(seeds, maps)
-
-
-def parse_seeds(s: str) -> list[int]:
-    _, *seeds = s.split()
-    return [int(seed) for seed in seeds]
+    return Almanac(maps)
 
 
 def parse_map(s: str) -> AlmanacMap:
