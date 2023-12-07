@@ -31,15 +31,15 @@ class Hand:
     def type(self) -> HandType:
         card_counts = Counter[Card](self.cards)
         match card_counts.most_common():
-            case (_, 5), *_:
+            case (_, 5), _:
                 return HandType.FIVE_OF_A_KIND
-            case (_, 4), *_:
+            case (_, 4), _:
                 return HandType.FOUR_OF_A_KIND
             case (_, 3), (_, 2):
                 return HandType.FULL_HOUSE
             case (_, 3), *_:
                 return HandType.THREE_OF_A_KIND
-            case (_, 2), (_, 2), *_:
+            case (_, 2), (_, 2), _:
                 return HandType.TWO_PAIR
             case (_, 2), *_:
                 return HandType.ONE_PAIR
