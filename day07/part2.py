@@ -1,4 +1,4 @@
-# https://adventofcode.com/2023/day/7
+# https://adventofcode.com/2023/day/7#part2
 from __future__ import annotations
 
 from collections import Counter
@@ -33,7 +33,8 @@ class Hand:
 
         if len(card_counts) > 1:
             joker_count = card_counts.pop(Card.J, 0)
-            card_counts.update({card_counts.most_common(1)[0][0]: joker_count})
+            [(most_common_card, _)] = card_counts.most_common(1)
+            card_counts.update({most_common_card: joker_count})
 
         match card_counts.most_common():
             case (_, 5), *_:
