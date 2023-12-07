@@ -5,16 +5,12 @@ from collections import Counter
 from dataclasses import dataclass
 from enum import IntEnum, auto
 from functools import cached_property
-from typing import Literal
 
 import pytest
 
 import support
 
-Card = Literal["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]
-
-# ordered by strength
-CARDS = ("2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A")
+Card = IntEnum("Card", "2 3 4 5 6 7 8 9 T J Q K A")
 
 
 class HandType(IntEnum):
@@ -29,7 +25,7 @@ class HandType(IntEnum):
 
 @dataclass(frozen=True)
 class Hand:
-    cards: tuple[Card, Card, Card, Card, Card]
+    cards: tuple[Card, ...]
 
     @cached_property
     def type(self) -> HandType:
@@ -39,7 +35,7 @@ class Hand:
                 return HandType.FIVE_OF_A_KIND
             case (_, 4), *_:
                 return HandType.FOUR_OF_A_KIND
-            case (_, 3), (_, 2), *_:
+            case (_, 3), (_, 2):
                 return HandType.FULL_HOUSE
             case (_, 3), *_:
                 return HandType.THREE_OF_A_KIND
@@ -51,16 +47,17 @@ class Hand:
                 return HandType.HIGH_CARD
 
     def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Hand):
+            return NotImplemented
+
         return self.type == other.type and self.cards == other.cards
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, Hand):
-            return super().__lt__(other)
-        if self.type == other.type:
-            for card, other_card in zip(self.cards, other.cards):
-                if card != other_card:
-                    return card_strength(card) < card_strength(other_card)
+            return NotImplemented
 
+        if self.type == other.type:
+            return self.cards < other.cards
         return self.type < other.type
 
 
@@ -70,14 +67,10 @@ def solve_for(input_data: str) -> int:
     return sum(rank * hand_bid[1] for rank, hand_bid in enumerate(hand_bids, 1))
 
 
-def parse_hand_and_bid(line: str) -> tuple(Hand, int):
+def parse_hand_and_bid(line: str) -> tuple[Hand, int]:
     hand, bid = line.split()
 
-    return Hand(cards=tuple([*hand])), int(bid)
-
-
-def card_strength(card: Card) -> int:
-    return CARDS.index(card)
+    return Hand(cards=tuple([Card[card] for card in hand])), int(bid)
 
 
 EXAMPLE_1 = """\
