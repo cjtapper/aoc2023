@@ -51,7 +51,7 @@ class IntervalTree(Generic[T]):
             return self._search_by_range(self.root, key)
 
     def _search_by_range(self, node: IntervalTreeNode[T], key: range) -> T | None:
-        if key.stop < node.interval.start:
+        if key.stop <= node.interval.start:
             return self._search_by_range(node.left, key) if node.left else None
         if key.start >= node.interval.stop:
             return self._search_by_range(node.right, key) if node.right else None
