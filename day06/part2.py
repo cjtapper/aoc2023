@@ -1,4 +1,4 @@
-# https://adventofcode.com/2023/day/6
+# https://adventofcode.com/2023/day/6#part2
 from __future__ import annotations
 
 import math
