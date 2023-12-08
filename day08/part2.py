@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+import math
 import re
 from typing import NamedTuple
 
@@ -11,9 +12,6 @@ import pytest
 import support
 
 NODE_PATTERN = re.compile(r"([A-Z0-9]{3}) = \(([A-Z0-9]{3}), ([A-Z0-9]{3})\)")
-
-START_LABEL = "AAA"
-DEST_LABEL = "ZZZ"
 
 
 class NetworkNode(NamedTuple):
@@ -28,18 +26,25 @@ def solve_for(input_data: str) -> int:
     parsed_nodes = (parse_node(line) for line in network_s.splitlines())
 
     network = {node.label: node for node in parsed_nodes}
-    current_node = network[START_LABEL]
+    current_nodes = [node for node in network.values() if node.label.endswith("A")]
+    steps_required = [-1] * len(current_nodes)
     for step, instruction in enumerate(itertools.cycle(instructions), 1):
-        if instruction == "L":
-            current_node = network[current_node.left]
-        elif instruction == "R":
-            current_node = network[current_node.right]
-        else:
-            raise ValueError(f"Invalid instruction: {instruction}")
-        if current_node.label == DEST_LABEL:
+        for index, node in enumerate(current_nodes):
+            if instruction == "L":
+                next_node = network[node.left]
+            elif instruction == "R":
+                next_node = network[node.right]
+            else:
+                raise ValueError(f"Invalid instruction: {instruction}")
+
+            if next_node.label.endswith("Z") and steps_required[index] < 0:
+                steps_required[index] = step
+
+            current_nodes[index] = next_node
+        if all(s > 0 for s in steps_required):
             break
 
-    return step
+    return math.lcm(*steps_required)
 
 
 def parse_node(s: str) -> NetworkNode:
