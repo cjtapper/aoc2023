@@ -64,7 +64,7 @@ class Hand:
 def solve_for(input_data: str) -> int:
     hand_bids = [parse_hand_and_bid(line) for line in input_data.splitlines()]
     hand_bids.sort(key=lambda hb: hb[0])
-    return sum(rank * hand_bid[1] for rank, hand_bid in enumerate(hand_bids, 1))
+    return sum(rank * bid for rank, (hand, bid) in enumerate(hand_bids, 1))
 
 
 def parse_hand_and_bid(line: str) -> tuple[Hand, int]:
