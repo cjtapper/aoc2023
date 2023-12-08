@@ -19,16 +19,17 @@ def solve_for(input_data: str) -> int:
     almanac = common.parse_almanac(input_data)
     seed_ranges = parse_seed_ranges(input_data)
 
-    min_location: int = float("inf")  # type: ignore[assignment]
-    for seed in itertools.chain.from_iterable(seed_ranges):
-        location = almanac.find_dest(
-            src_category="seed",
-            src=seed,
-            dest_category="location",
+    locations = []
+    for seed_range in seed_ranges:
+        locations.extend(
+            almanac.find_dest_by_range(
+                src_category="seed",
+                src_range=seed_range,
+                dest_category="location",
+            )
         )
-        min_location = min(location, min_location)
 
-    return min_location
+    return min(location.start for location in locations)
 
 
 def parse_seed_ranges(s: str) -> Generator[range, None, None]:

@@ -78,6 +78,23 @@ class Almanac:
             src_category = map.dest_category
         return target
 
+    def find_dest_by_range(
+        self, src_category: str, src_range: range, dest_category: str
+    ) -> list[range]:
+        result = [src_range]
+        target_ranges = []
+        while src_category != dest_category:
+            map = self.maps[src_category]
+            target_ranges = result
+            result = []
+
+            while target_ranges:
+                target = target_ranges.pop()
+                dest = map.find_dest_ranges(target)
+                result.extend(dest)
+            src_category = map.dest_category
+        return result
+
 
 @dataclass
 class AlmanacMap:
@@ -92,6 +109,30 @@ class AlmanacMap:
             return source
         dest = map_entry.find_dest(source)
         return dest or source
+
+    def find_dest_ranges(self, src_range: range) -> list[range]:
+        results = []
+        target_ranges = [src_range]
+        while target_ranges:
+            target = target_ranges.pop()
+            map_entry = self.entries.search_by_range(target)
+            if not map_entry:
+                results.append(target)
+            else:
+                intersection = range_intersection(map_entry.src_range, target)
+                if not intersection:
+                    results.append(target)
+                    continue
+
+                intersection_start_offset = (
+                    intersection.start - map_entry.src_range.start
+                )
+                dest_start = map_entry.dest_range.start + intersection_start_offset
+                results.append(range(dest_start, dest_start + len(intersection)))
+                diff = diff_ranges(target, map_entry.src_range)
+                target_ranges.extend(diff)
+
+        return results
 
 
 @dataclass
@@ -150,7 +191,7 @@ def range_intersection(r1: range, r2: range) -> range | None:
     if r1.stop <= r2.start:
         return None
 
-    return range(r2.start, r1.stop)
+    return range(max(r1.start, r2.start), min(r1.stop, r2.stop))
 
 
 def diff_ranges(r1: range, r2: range) -> list[range]:
@@ -158,7 +199,7 @@ def diff_ranges(r1: range, r2: range) -> list[range]:
     result: list[range] = []
     if r1.start < r2.start:
         result.append(range(r1.start, min(r1.stop, r2.start)))
-    if r1.stop >= r2.stop:
+    if r1.stop > r2.stop:
         result.append(range(max(r1.start, r2.stop), r1.stop))
     return result
 
